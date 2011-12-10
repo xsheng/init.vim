@@ -39,13 +39,15 @@ class InverseLaplace():
             V[i] = sign*V[i]
         #print "V[1..N/2] = ", V     #debug
 
-        f = 0
-        for i in range(1, N/2+1, 1):
-            u = i*ln2/t
-            f = f + V[i] * F(u)
-        f = ln2/t*f
+        f = np.zeros_like(t)
+        for j in range(0, len(t), 1):
+            for i in range(1, N/2+1, 1):
+                u = i*ln2/t[j]
+                f[j] = f[j] + V[i] * F(u)
+            f[j] = ln2/t[j]*f[j]
         
         return f
+    
 def test():
     import matplotlib.pyplot as plt
     def tstF(u):
@@ -53,10 +55,7 @@ def test():
 
     invLaplace = InverseLaplace(tstF)
     t = np.arange(0.1, 1.0, 0.1)
-
-    ft = np.zeros_like(t)
-    for i in np.arange(0,len(t),1):
-        ft[i] = invLaplace.Stehfest(t[i])
+    ft = invLaplace.Stehfest(t)
 
     plt.plot(t,ft)
     plt.show()
