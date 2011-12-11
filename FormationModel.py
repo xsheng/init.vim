@@ -12,6 +12,7 @@ class FormationModel():
 
     def SphericalLaplace(self,u, R_D, C_D, S):
         '''
+        laplace solution of ideal one-layer spherical reservoir model with constant pressure boundary
         u is the laplace variable
         R_D is the dimensionless reservoir radius
         C_D is the dimensionless storage factor
