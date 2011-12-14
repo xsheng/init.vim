@@ -7,13 +7,13 @@ import scipy as sci
 
 class InverseLaplace():
     def __init__(self, LaplaceFunc):
-        '''
+        """
         Initialize the methods
-        '''
+        """
         self.F = LaplaceFunc
 
     def Stehfest(self, t):
-        '''
+        """
         Stehfest method works for smooth function
         f(t) = ln(2)/t \sum_{i=1}^{N}V_i*F(u),
         where u = (i*ln(2))/t is the Laplace variable,
@@ -23,7 +23,7 @@ class InverseLaplace():
 
         @param t is time
         @param F is the laplace image function
-        '''
+        """
         F = self.F
         N = 10
         ln2 = np.log(2)
@@ -51,7 +51,7 @@ class InverseLaplace():
 
     def Stehfest1(self, t, n, c):
         if n%2 == 1:
-            n = n+1
+            n += 1
 
         y = np.zeros_like(t)
         m = len(t)
@@ -85,7 +85,7 @@ class InverseLaplace():
         for j in range(0, m, 1):
             tt = t[j]
             sfa = 0
-            if(tt == 0):
+            if not tt:
                 tt = 1.0e-8
             a = np.log(2)/tt
 
@@ -95,6 +95,12 @@ class InverseLaplace():
             sfa = np.exp(c*tt)*sfa*a
             y[j] = sfa
         return y
+
+    def GaussLegendre(self, t, n, c):
+        """
+        
+        """
+        pass
 
     
 def test():
