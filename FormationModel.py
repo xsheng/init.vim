@@ -56,3 +56,33 @@ class FormationModel():
         sqrt_u = np.sqrt(u)
         pwd = 1/u*(kn(0, sqrt_u) + S)/(1+C_D*u*(kn(0,sqrt_u)+S))
         return pwd
+
+def test():
+    from InverseLaplace import InverseLaplace
+    import matplotlib.pyplot as plt
+    RadialFormation = FormationModel("Infinite Radial", "ConstantPressure")
+
+    # infinite reservoir line source solution
+    F = lambda u: RadialFormation.InfiniteSizeLineSource(u, 1.0, 1.0)
+    invLap = InverseLaplace(F)
+    t = np.arange(0.01, np.pi, 0.01)
+    ft = invLap.Stehfest(t)
+
+    # infinite reservoir spherical solution
+    Fcp = lambda u:RadialFormation.SphericalLaplace(u, 10.0, 1.0, 1.0)
+    invLapcp = InverseLaplace(Fcp)
+    ftcp = invLapcp.Stehfest(t)
+
+    # infinite reservoir 
+    Fls = lambda u:RadialFormation.InfiniteSize(u, 1.0, 1.0)
+    invLapls = InverseLaplace(Fls)
+    ftls = invLapls.Stehfest(t)
+
+    plt.plot(t,ft, \
+             t, ftcp, \
+             t, ftls
+    )
+    plt.show()
+    
+if __name__=="__main__":
+    test()
