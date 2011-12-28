@@ -4,6 +4,17 @@ This module is the interface of formation model.
 '''
 import numpy as np
 from scipy.special import iv,kn # bessel functions
+from numpy import sqrt
+from cmath import tanh, cosh, sinh
+
+def coth(x):
+    return cosh(x)/sinh(x)
+
+I1 = lambda x: iv(1, x)
+I0 = lambda x: iv(0, x)
+K1 = lambda x: kn(1, x)
+K0 = lambda x: kn(0, x)
+print K0(1)
 
 class FormationModel():
 
@@ -26,11 +37,11 @@ class FormationModel():
         sqrt_u = np.sqrt(u)
         sqrt_uRd = sqrt_u*R_D
         if self.BC == "ConstantPressure":
-            fu = sqrt_u*(kn(1,sqrt_u)*iv(0,sqrt_uRd) + kn(0,sqrt_uRd)*iv(1,sqrt_u)) /\
-                 (kn(1,sqrt_u)*iv(0,sqrt_uRd) - kn(0,sqrt_uRd)*iv(0,sqrt_u))
+            fu = sqrt_u*(K1(sqrt_u)*I0(sqrt_uRd) + K0(sqrt_uRd)*I1(sqrt_u)) /\
+                 (K1(sqrt_u)*I0(sqrt_uRd) - K0(sqrt_uRd)*I0(sqrt_u))
         elif self.BC == "Closed":
-            fu = sqrt_u*(kn(1,sqrt_u)*iv(0,sqrt_uRd) - kn(0,sqrt_uRd)*iv(1,sqrt_u)) /\
-                 (kn(1,sqrt_u)*iv(0,sqrt_uRd) + kn(0,sqrt_uRd)*iv(0,sqrt_u))
+            fu = sqrt_u*(K1(sqrt_u)*I0(sqrt_uRd) - K0(sqrt_uRd)*I1(sqrt_u)) /\
+                 (K1(sqrt_u)*I0(sqrt_uRd) + K0(sqrt_uRd)*I0(sqrt_u))
         pwd = 1/u*(1+S*fu)/(fu+C_D*u*(1+S*fu))
         return pwd
 
@@ -41,9 +52,9 @@ class FormationModel():
         S is skin factor
         """
         sqrt_u = np.sqrt(u)
-        pwd = 1/u*(kn(0,sqrt_u) + S*sqrt_u*kn(1,sqrt_u))/\
-              (sqrt_u*kn(1, sqrt_u) + C_D*u*\
-                                      (kn(0,sqrt_u)+S*sqrt_u*kn(1,sqrt_u)))
+        pwd = 1/u*(K0(sqrt_u) + S*sqrt_u*K1(sqrt_u))/\
+              (sqrt_u*K1(sqrt_u) + C_D*u*\
+                                      (K0(sqrt_u)+S*sqrt_u*K1(sqrt_u)))
         return pwd
 
     def InfiniteSizeLineSource(self, u, C_D, S):
@@ -53,9 +64,31 @@ class FormationModel():
         C_D is the dimensionless storage factor
         S is skin factor
         """
-        sqrt_u = np.sqrt(u)
-        pwd = 1/u*(kn(0, sqrt_u) + S)/(1+C_D*u*(kn(0,sqrt_u)+S))
+        sqrt_u = sqrt(u)
+        pwd = 1/u*(K0(sqrt_u) + S)/(1+C_D*u*(K0(sqrt_u)+S))
         return pwd
+
+    def func_f_steady(self, _omega, _lambda, u):
+        return (_omega*(1-_omega)*u + _lambda)/((1-_omega)*u + _lambda)
+
+    def func_f_plate(self, _omega, _lambda, u):
+        return _omega + sqrt(_lambda*(1-_omega)/3/u)*tanh(sqrt(3*(1-_omega)*u/_lambda))
+
+    def func_f_spherical(self, _omega, _lambda, u):
+        tmp = 15*(1-_omega)*u/_lambda
+        return _omega + 1.0/5*_lambda/u*(sqrt(tmp)*coth(sqrt(tmp)) -1)
+
+    def func_f_cylinder(self, _omega, _lambda, u):
+        """
+        f(u) = \omega +2*\sqrt((1-\omega)*\lambda/(15u)) * I_1(\sqrt((1-\omega)*\lambda/(15u)))/I_0(\sqrt((1-\omega)*\lambda/(15u)))
+        """
+        tmp = (1-_omega)*_lambda/15/u
+        return _omega + 2*sqrt(tmp)*I1(tmp)/I0(tmp)
+
+    def InfiniteSizeDualPoro(self, f,  u, c_D, S):
+        return self.InfiniteSize(f(u)*u, c_D, S)
+
+
 
 def test():
     from InverseLaplace import InverseLaplace
@@ -65,7 +98,7 @@ def test():
     # infinite reservoir line source solution
     F = lambda u: RadialFormation.InfiniteSizeLineSource(u, 1.0, 1.0)
     invLap = InverseLaplace(F)
-    t = np.arange(0.01, np.pi, 0.01)
+    t = np.arange(0.01, 10*np.pi, 0.1)
     ft = invLap.Stehfest(t)
 
     # infinite reservoir spherical solution
@@ -78,9 +111,17 @@ def test():
     invLapls = InverseLaplace(Fls)
     ftls = invLapls.Stehfest(t)
 
+    _omega = 0.5
+    _lambda = 0.5
+    f = lambda u: RadialFormation.func_f_cylinder(_omega, _lambda, u)
+    Fdp = lambda u: RadialFormation.InfiniteSizeDualPoro(f, u, 1.0, 1.0 )
+    invLapDp = InverseLaplace(Fdp)
+    ftdp = invLapDp.Stehfest(t)
+
     plt.plot(t,ft, \
              t, ftcp, \
-             t, ftls
+             t, ftls, \
+             t, ftdp
     )
     plt.show()
     
