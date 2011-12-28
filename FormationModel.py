@@ -14,7 +14,7 @@ I1 = lambda x: iv(1, x)
 I0 = lambda x: iv(0, x)
 K1 = lambda x: kn(1, x)
 K0 = lambda x: kn(0, x)
-print K0(1)
+
 
 class FormationModel():
 
@@ -53,8 +53,8 @@ class FormationModel():
         """
         sqrt_u = np.sqrt(u)
         pwd = 1/u*(K0(sqrt_u) + S*sqrt_u*K1(sqrt_u))/\
-              (sqrt_u*K1(sqrt_u) + C_D*u*\
-                                      (K0(sqrt_u)+S*sqrt_u*K1(sqrt_u)))
+              (sqrt_u*K1(sqrt_u) + C_D*u*
+                                   (K0(sqrt_u)+S*sqrt_u*K1(sqrt_u)))
         return pwd
 
     def InfiniteSizeLineSource(self, u, C_D, S):
@@ -111,6 +111,7 @@ def test():
     invLapls = InverseLaplace(Fls)
     ftls = invLapls.Stehfest(t)
 
+    # infinite dual porosity reservoir
     _omega = 0.5
     _lambda = 0.5
     f = lambda u: RadialFormation.func_f_cylinder(_omega, _lambda, u)
@@ -118,9 +119,9 @@ def test():
     invLapDp = InverseLaplace(Fdp)
     ftdp = invLapDp.Stehfest(t)
 
-    plt.plot(t,ft, \
-             t, ftcp, \
-             t, ftls, \
+    plt.plot(t, ft,
+             t, ftcp,
+             t, ftls,
              t, ftdp
     )
     plt.show()
