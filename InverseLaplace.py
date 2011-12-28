@@ -90,7 +90,7 @@ class InverseLaplace():
         e[2*M][0] = 0.0
 
         for r in range(1, M, 1): # 1...M-1
-            for i in range(2*(M-r), 0, -1): # 2*(M-r)...0
+            for i in range(2*(M-r), -1, -1): # 2*(M-r)...0
                 if i< 2*(M-r) & r > 1:
                     q[i][r] = q[i+1][r-1]*e[i+1][r-1]/e[i][r-1]
                 e[i][r] = q[i+1][r] - q[i][r] + e[i+1][r-1]
@@ -112,7 +112,7 @@ class InverseLaplace():
             B[n] = B[n-1]+dz*B[n-2]
 
         h2M = 0.5*(1.0+z*(d[2*M-1] - d[2*M]))
-        R2M = -h2M*(1.0 - sqrt(1.0 + (2*d[2*M]/h2M/h2M)))
+        R2M = -h2M*(1.0 - sqrt(1.0 + (z*d[2*M]/h2M/h2M)))
 
         A[2*M+1] = A[2*M] + R2M*A[2*M - 1]
         B[2*M+1] = B[2*M] + R2M*B[2*M - 1]
@@ -136,7 +136,7 @@ def test():
 
     plt.plot(t,ft,
              t, sint,
-             t, np.abs(ft - sint),
+             #t, np.abs(ft - sint),
              t, ft_dehoog
     )
     plt.show()
