@@ -6,6 +6,7 @@ import numpy as np
 import scipy as sci
 from cmath import log
 from numpy import pi, cos, sin, sqrt, exp, real
+from numpy.fft import ifft
 
 class InverseLaplace():
     def __init__(self, LaplaceFunc):
@@ -118,6 +119,155 @@ class InverseLaplace():
         B[2*M+1] = B[2*M] + R2M*B[2*M - 1]
 
         return 1.0/T*exp(gamma*t)*real(A[2*M+1]/B[2*M+1])
+
+    def Iseger(self, Delta, k):
+        """
+        "Numerical Transform Inversion Using Gaussian Quadrature" developed by Peter Den Iseger
+        """
+        M = pow(2,k)
+        M2 = 8*M
+        a = 44/M2
+        n = 16
+        if n == 16:
+            _lambda = [0.0,
+                4.44089209850063e-016,
+                6.28318530717958     ,
+                12.5663706962589     ,
+                18.8502914166954     ,
+                25.2872172156717     ,
+                34.296971663526      ,
+                56.1725527716607     ,
+                170.533131190126
+            ]
+            beta = [0.0,
+                1,
+                1.00000000000004,
+                1.00000015116847,
+                1.00081841700481,
+                1.09580332705189,
+                2.00687652338724,
+                5.94277512934943,
+                54.9537264520382
+            ]
+        if n == 32:
+            _lambda = [0.0,
+                0               ,
+                6.28318530717958,
+                12.5663706143592,
+                18.8495559215388,
+                25.1327412287184,
+                31.4159265359035,
+                37.6991118820067,
+                43.9823334683971,
+                50.2716029125234,
+                56.7584358919044,
+                64.7269529917882,
+                76.7783110023797,
+                96.7780294888711,
+                133.997553190014,
+                222.527562038705,
+                669.650134867713
+            ]
+            beta = [0.0,
+                1 ,
+                1 ,
+                1 ,
+                1 ,
+                1 ,
+                1.00000000000895 ,
+                1.00000004815464 ,
+                1.00003440685547 ,
+                1.00420404867308 ,
+                1.09319461846681 ,
+                1.51528642466058 ,
+                2.4132076646714  ,
+                4.16688127092229 ,
+                8.3777001312961 ,
+                23.6054680083019,
+                213.824023377988
+            ]
+
+        if n == 48:
+            _lambda = [0.0,
+                0 		 ,
+                6.28318530717957 ,
+                12.5663706143592 ,
+                18.8495559215388 ,
+                25.1327412287183 ,
+                31.4159265358979 ,
+                37.6991118430775 ,
+                43.9822971502571 ,
+                50.2654824574367 ,
+                56.5486677646182 ,
+                62.8318530747628 ,
+                69.1150398188909 ,
+                75.3984537709689 ,
+                81.6938697567735 ,
+                88.1889420301504 ,
+                95.7546784637379 ,
+                105.767553649199 ,
+                119.58751936774  ,
+                139.158762677521 ,
+                168.156165377339 ,
+                214.521886792255 ,
+                298.972429369901 ,
+                497.542914576338 ,
+                1494.71066227687
+            ]
+            beta = [0.0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1.00000000000234,
+                1.00000000319553,
+                1.00000128757818,
+                1.00016604436873,
+                1.00682731991922,
+                1.08409730759702,
+                1.3631917322868 ,
+                1.85773538601497,
+                2.59022367414073,
+                3.73141804564276,
+                5.69232680539143,
+                9.54600616545647,
+                18.8912132110256,
+                52.7884611477405,
+                476.448331869636
+            ]
+
+        F = self.F
+        f_hat_jk = np.zeros((n/2+1, M2+1))
+        f_hat = np.zeros(M2+1)
+        for k in range(0, M2+1, 1): # 0...M2
+            for j in range(1, n/2+1, 1):    # 1...n/2
+                f_hat_jk[j][k] = real(F(complex(a,_lambda[j]+2*pi*k/M2)/Delta))
+            for j in range(1, n/2+1, 1):    # 1...n/2
+                f_hat[k] += beta[j]*f_hat_jk[j][k]
+            f_hat[k] *= 2.0/Delta
+        for j in range(1, n/2+1, 1):    # 1...n/2
+            f_hat[0] += beta[j]*(f_hat_jk[j][0] + f_hat_jk[j][M2])
+        f_hat[0] *= 1.0/Delta
+
+        #f = 1/M2*real(ifft(f_hat))
+        f = np.zeros(M2)
+        for l in range(0, M2):
+            for k in range(0, M2):
+                f[l] += f_hat[k]*cos(2*pi*l*k/M2)
+            f[l] *= 1.0/M2
+
+        for l in range(0, M):
+            f[l] = exp(a*l)*f[l]
+            
+        return f[0:M]
+
+
+
     
 def test():
     import matplotlib.pyplot as plt
@@ -126,14 +276,14 @@ def test():
         return 1.0/(u*u+1)
 
     invLaplace = InverseLaplace(tstF)
-    t = np.arange(0.01, np.pi, 0.01)
-    sint = np.sin(t)
+    t = np.arange(0.01, np.pi*2, 0.01)
+    sint = sin(t)
     ft = invLaplace.Stehfest(t)
 
     ft_dehoog  = np.zeros_like(t)
     for i in range(0, len(t), 1):
         ft_dehoog[i] = invLaplace.DeHoog(t[i])
-
+        
     plt.plot(t,ft,
              t, sint,
              t, np.abs(ft - sint),
@@ -141,6 +291,19 @@ def test():
              t, np.abs(ft_dehoog - sint)
     )
     plt.show()
+    
+    """
+    k = 7
+    M = pow(2,k)
+    tn = np.arange(0, M, 1)*10.0/M
+    fn = invLaplace.Iseger(10.0/M, k)
+
+    plt.plot(
+        tn,fn,
+        tn, sin(tn)
+    )
+    plt.show()
+    """
 
 if __name__ == "__main__":
     test()

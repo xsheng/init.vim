@@ -4,16 +4,16 @@ This module is the interface of formation model.
 '''
 import numpy as np
 from scipy.special import iv,kn # bessel functions
-from numpy import sqrt
+from numpy import sqrt, real
 from cmath import tanh, cosh, sinh
 
 def coth(x):
     return cosh(x)/sinh(x)
 
-I1 = lambda x: iv(1, x)
-I0 = lambda x: iv(0, x)
-K1 = lambda x: kn(1, x)
-K0 = lambda x: kn(0, x)
+I1 = lambda x: iv(1, real(x))
+I0 = lambda x: iv(0, real(x))
+K1 = lambda x: kn(1, real(x))
+K0 = lambda x: kn(0, real(x))
 
 
 class FormationModel():
@@ -113,16 +113,20 @@ def test():
 
     # infinite dual porosity reservoir
     _omega = 0.5
-    _lambda = 0.5
+    _lambda = 0.1   # lambda value has a great impact on latter period pressure response
     f = lambda u: RadialFormation.func_f_cylinder(_omega, _lambda, u)
     Fdp = lambda u: RadialFormation.InfiniteSizeDualPoro(f, u, 1.0, 1.0 )
     invLapDp = InverseLaplace(Fdp)
     ftdp = invLapDp.Stehfest(t)
+    ft_dehoog  = np.zeros_like(t)
+    for i in range(0, len(t), 1):
+        ft_dehoog[i] = invLapDp.DeHoog(t[i])
 
-    plt.plot(t, ft,
-             t, ftcp,
-             t, ftls,
-             t, ftdp
+    plt.plot(#t, ft,
+             #t, ftcp,
+             #t, ftls,
+             t, ftdp,
+             t, ft_dehoog
     )
     plt.show()
     
