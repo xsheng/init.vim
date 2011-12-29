@@ -5,7 +5,7 @@ This module is the interface of inverse laplace methods for computing ideal resp
 import numpy as np
 import scipy as sci
 from cmath import log
-from numpy import pi, cos, sin, sqrt, exp
+from numpy import pi, cos, sin, sqrt, exp, real
 
 class InverseLaplace():
     def __init__(self, LaplaceFunc):
@@ -91,7 +91,7 @@ class InverseLaplace():
 
         for r in range(1, M, 1): # 1...M-1
             for i in range(2*(M-r), -1, -1): # 2*(M-r)...0
-                if i< 2*(M-r) & r > 1:
+                if i< 2*(M-r) and r > 1:
                     q[i][r] = q[i+1][r-1]*e[i+1][r-1]/e[i][r-1]
                 e[i][r] = q[i+1][r] - q[i][r] + e[i+1][r-1]
 
@@ -117,7 +117,7 @@ class InverseLaplace():
         A[2*M+1] = A[2*M] + R2M*A[2*M - 1]
         B[2*M+1] = B[2*M] + R2M*B[2*M - 1]
 
-        return 1.0/T*exp(gamma*t)*np.real(A[2*M+1]/B[2*M+1])
+        return 1.0/T*exp(gamma*t)*real(A[2*M+1]/B[2*M+1])
     
 def test():
     import matplotlib.pyplot as plt
@@ -126,7 +126,7 @@ def test():
         return 1.0/(u*u+1)
 
     invLaplace = InverseLaplace(tstF)
-    t = np.arange(0.01, np.pi/2.0, 0.01)
+    t = np.arange(0.01, np.pi, 0.01)
     sint = np.sin(t)
     ft = invLaplace.Stehfest(t)
 
@@ -136,8 +136,9 @@ def test():
 
     plt.plot(t,ft,
              t, sint,
-             #t, np.abs(ft - sint),
-             t, ft_dehoog
+             t, np.abs(ft - sint),
+             t, ft_dehoog,
+             t, np.abs(ft_dehoog - sint)
     )
     plt.show()
 
