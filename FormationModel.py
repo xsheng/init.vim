@@ -110,22 +110,26 @@ def test():
     Fls = lambda u:RadialFormation.InfiniteSize(u, 1.0, 1.0)
     invLapls = InverseLaplace(Fls)
     ftls = invLapls.Stehfest(t)
+    ftls_dehoog = np.vectorize(invLapls.DeHoog)(t)
 
     # infinite dual porosity reservoir
     _omega = 0.5
-    _lambda = 0.1   # lambda value has a great impact on latter period pressure response
+    _lambda = 0.15   # lambda value has a great impact on latter period pressure response
     f = lambda u: RadialFormation.func_f_cylinder(_omega, _lambda, u)
     Fdp = lambda u: RadialFormation.InfiniteSizeDualPoro(f, u, 1.0, 1.0 )
     invLapDp = InverseLaplace(Fdp)
     ftdp = invLapDp.Stehfest(t)
     ft_dehoog  = np.zeros_like(t)
-    for i in range(0, len(t), 1):
-        ft_dehoog[i] = invLapDp.DeHoog(t[i])
+    DeHoog = np.vectorize(invLapDp.DeHoog)
+    ft_dehoog = DeHoog(t)
+    #for i in range(0, len(t), 1):
+    #    ft_dehoog[i] = invLapDp.DeHoog(t[i])
 
     plt.plot(#t, ft,
              #t, ftcp,
              #t, ftls,
-             t, ftdp,
+             t, ftls_dehoog,
+             #t, ftdp,
              t, ft_dehoog
     )
     plt.show()
