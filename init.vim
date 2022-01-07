@@ -1,3 +1,4 @@
+" https://github.com/zenbro/dotfiles/blob/master/.nvimrc
 set nocompatible              " be improved, required
 filetype off                  " required
 chdir ~			      " change the dir to ~
