@@ -1,139 +1,154 @@
 " https://github.com/zenbro/dotfiles/blob/master/.nvimrc
-set nocompatible              " be improved, required
-filetype off                  " required
-chdir ~			      " change the dir to ~
+set nocompatible              " be iMproved, required
+" filetype off                  " required
+chdir ~ " change the dir to ~
 
-"{{{ set <leader> as <space>, ; as :
+"{{{ Set <LEADER> as <SPACE>, ; as :
 let mapleader=" "
 "}}}
 
-"{{{ copy from system clispboard
+"{{{ Copy from system clipboard
 " turn on the shift-insert behavior for windows
-map! <s-insert>  <c-r>+
+map! <S-Insert>  <C-R>+
 " "+p will paste from the system clipboard
 " "+y will copy to it
 " }}}
 
-"{{{ general settings
+"{{{ General settings
+" ====================================================================
 set mouse=a " to enable mouse for visual selection
 set scrolloff=999 " keep cursor at the middle of screen
 set cursorline " show the cursorline 
 set visualbell " disable sound bell
 set nowrap " don't wrap long lines
-nnoremap <leader> w :w<cr>
-nnoremap <leader> q :q!<cr>
+nnoremap <LEADER> w :w<Enter>
+nnoremap <LEADER> q :q!<Enter>
 set undolevels=5000 "set maximum undo levels
 set ruler "turn on ruler on the status line
 set colorcolumn=77
-highlight! colorcolumn ctermbg=233 guibg=#131313
-" various columns
-highlight! signcolumn ctermbg=233 guibg=#0d0d0d
-highlight! foldcolumn ctermbg=233 guibg=#0d0d0d
-" disable search highlighting
-nnoremap <silent> <esc><esc> :nohlsearch<cr><esc>
+highlight! ColorColumn ctermbg=233 guibg=#131313
+" Various columns
+highlight! SignColumn ctermbg=233 guibg=#0D0D0D
+highlight! FoldColumn ctermbg=233 guibg=#0D0D0D
+" Disable search highlighting
+nnoremap <silent> <Esc><Esc> :nohlsearch<CR><Esc>
 " }}}
 
-" cursor configuration {{{
+" Cursor configuration {{{
 " ====================================================================
-" use a blinking upright bar cursor in insert mode, a solid block in normal
+" Use a blinking upright bar cursor in Insert mode, a solid block in normal
 " and a blinking underline in replace mode
-let $nvim_tui_enable_cursor_shape=1
-let &t_si = "\<esc>[5 q"
-let &t_sr = "\<esc>[3 q"
-let &t_ei = "\<esc>[2 q"
+let $NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+let &t_SI = "\<Esc>[5 q"
+let &t_SR = "\<Esc>[3 q"
+let &t_EI = "\<Esc>[2 q"
 " }}}
 
 
-" {{{{ vundle
-" set the runtime path to include vundle and initialize
-set rtp+=~/.vim/bundle/vundle.vim
+" {{{{ Vundle
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
-" alternatively, pass a path where vundle should install plugins
+" alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
-" let vundle manage vundle, required
-plugin 'vundlevim/vundle.vim'
+" let Vundle manage Vundle, required
+Plugin 'VundleVim/Vundle.vim'
 
-" the following are examples of different formats supported.
-" keep plugin commands between vundle#begin/end.
-" plugin on github repo
-plugin 'tpope/vim-fugitive'
-plugin 'aserebryakov/vim-todo-lists'
+" The following are examples of different formats supported.
+" Keep Plugin commands between vundle#begin/end.
+" plugin on GitHub repo
+Plugin 'tpope/vim-fugitive'
+Plugin 'aserebryakov/vim-todo-lists'
 " plugin from http://vim-scripts.org/vim/scripts.html
-" plugin 'l9'
-" git plugin not hosted on github
-plugin 'git://git.wincent.com/command-t.git'
+" Plugin 'L9'
+" Git plugin not hosted on GitHub
+Plugin 'git://git.wincent.com/command-t.git'
+" command-t requires ruby...
 " git repos on your local machine (i.e. when working on your own plugin)
-" plugin 'file:///home/gmarik/path/to/plugin'
-" the sparkup vim script is in a subdirectory of this repo called vim.
-" pass the path to set the runtimepath properly.
+" Plugin 'file:///home/gmarik/path/to/plugin'
+" The sparkup vim script is in a subdirectory of this repo called vim.
+" Pass the path to set the runtimepath properly.
 
-plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
-" install l9 and avoid a naming conflict if you've already installed a
+Plugin 'rstacruz/sparkup', {'rtp': 'vim/'}
+" Install L9 and avoid a Naming conflict if you've already installed a
 " different version somewhere else.
-" plugin 'ascenator/l9', {'name': 'newl9'}
+" Plugin 'ascenator/L9', {'name': 'newL9'}
 
-plugin 'inkarkat/vim-extractmatches'
+Plugin 'inkarkat/vim-ExtractMatches'
 
-" "grammar check
-" plugin 'rhysd/vim-grammarous' "this plugin requires java 8
+" "Grammar check
+" Plugin 'rhysd/vim-grammarous' "this plugin requires Java 8
 
-" grammar check with languagetool.org
-" it requires the languagetool to be installed first
-plugin 'dpelle/vim-languagetool'
+" Grammar check with Languagetool.org
+" it requires the Languagetool to be installed first
+Plugin 'dpelle/vim-LanguageTool'
 
 "lightline, fancy statusline
-plugin 'itchyny/lightline.vim'
+Plugin 'itchyny/lightline.vim'
 
-"nerdtree
-plugin 'preservim/nerdtree'
+"NERDTree
+Plugin 'preservim/nerdtree'
+"{{{NERDTree settings
+    nnoremap <leader>n :NERDTreeFocus<CR>
+    nnoremap <C-n> :NERDTree<CR>
+    nnoremap <C-t> :NERDTreeToggle<CR>
+    nnoremap <C-f> :NERDTreeFind<CR>
+"}}}
 
-"{{{fzf
-plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
-plugin 'junegunn/fzf.vim'
-plugin 'airblade/vim-rooter'
+"{{{FZF
+Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plugin 'junegunn/fzf.vim'
+Plugin 'airblade/vim-rooter'
 "}}}
 
 "ag
-"plugin 'numkil/ag.nvim'
+"Plugin 'numkil/ag.nvim'
 
-" markdown
+" Markdown
 " {{{
-" plugin 'suan/vim-instant-markdown', {'for': 'markdown'}
-plugin 'godlygeek/tabular'
-plugin 'plasticboy/vim-markdown'
-"plugin 'gabrielelana/vim-markdown'
-plugin 'dhruvasagar/vim-table-mode', { 'on': 'tablemodetoggle', 'for': ['text', 'markdown', 'vim-plug'] }
-plugin 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
-plugin 'iamcco/markdown-preview.nvim' 
-plugin 'dkarter/bullets.vim'
-"markdown preview
-plugin 'euclio/vim-markdown-composer'
+" Plugin 'suan/vim-instant-markdown', {'for': 'markdown'}
+Plugin 'godlygeek/tabular'
+Plugin 'plasticboy/vim-markdown'
+"Plugin 'gabrielelana/vim-markdown'
+Plugin 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle', 'for': ['text', 'markdown', 'vim-plug'] }
+Plugin 'mzlogin/vim-markdown-toc', { 'for': ['gitignore', 'markdown', 'vim-plug'] }
+Plugin 'iamcco/markdown-preview.nvim' 
+Plugin 'dkarter/bullets.vim'
+"Markdown preview
+Plugin 'euclio/vim-markdown-composer'
 " }}}
 " {{{ xtabline
-" plugin 'mg979/vim-xtabline'
-" all of your plugins must be added before the following line
+" Plugin 'mg979/vim-xtabline'
+"
+" Indent visualization
+Plugin 'nathanaelkane/vim-indent-guides'
+" {{{ indent settings
+    let g:indent_guides_enable_on_vim_startup = 1
+    let g:indent_guides_auto_colors = 1
+    set ts=4 sw=4 et
+    let g:indent_guides_start_level = 1
+    let g:indent_guides_guide_size = 1
+    "autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  guibg=grey   ctermbg=3
+    "autocmd VimEnter,Colorscheme * :hi IndentGuidesEven guibg=grey ctermbg=4
+" }}}
+
+" All of your Plugins must be added before the following line
 call vundle#end()            " required
 "}}}}
 
-" brief help
-" :pluginlist       - lists configured plugins
-" :plugininstall    - installs plugins; append `!` to update or just :pluginupdate
-" :pluginsearch foo - searches for foo; append `!` to refresh local cache
-" :pluginclean      - confirms removal of unused plugins; append `!` to auto-approve removal
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 "
-" see :h vundle for more details or wiki for faq
-" put your non-plugin stuff after this line
-" to ignore plugin indent changes, instead use:
+" see :h Vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+" To ignore plugin indent changes, instead use:
 "filetype plugin on
 "
 
-"{{{nerdtree settings
-nnoremap <leader>n :nerdtreefocus<cr>
-nnoremap <c-n> :nerdtree<cr>
-nnoremap <c-t> :nerdtreetoggle<cr>
-nnoremap <c-f> :nerdtreefind<cr>
-"}}}
 
 
 filetype plugin indent on    " required
@@ -144,42 +159,42 @@ set nobackup
 syntax on
 set spell spelllang=en_us
 "set guifont=courier_new:h12:b
-set guifont=consolas:h12
+set guifont=Consolas:h12
 set hlsearch
 colorscheme evening "morning
-set guioptions-=t "disable toolbar
+set guioptions-=T "disable toolbar
 
-" {{{ markdown settings
+" {{{ Markdown settings
 let g:markdown_composer_autostart = 0 " this is to prevent a new browser tab for markdown preview
 "{{vim-markdown-toc
 "let g:vmt_auto_update_on_save = 0
 "let g:vmt_dont_insert_fence = 1
 let g:vmt_cycle_list_item_markers = 1
-let g:vmt_fence_text = 'toc'
-let g:vmt_fence_closing_text = '/toc'
-noremap <leader>ms :markdownpreviewstop<cr>
+let g:vmt_fence_text = 'TOC'
+let g:vmt_fence_closing_text = '/TOC'
+noremap <LEADER>ms :MarkdownPreviewStop<CR>
 "}}
 let g:vim_markdown_math = 1
 "let g:vim_markdown_fenced_languages = ['csharp=cs', 'python=py']
-"noremap <leader>e :markdowneditcodeblock<cr>
+"noremap <LEADER>e :MarkdownEditCodeBlock<CR>
 "}}}
 
 
-" open the vimrc file anytime
+" Open the vimrc file anytime
 "
-noremap <leader>rc :e ~\appdata\local\nvim\init.vim<cr>
-noremap <leader>rn :exe 'edit '.stdpath('config').'/init.vim'<cr>
-noremap <leader>rv :e ~\_vimrc<cr>
-noremap <leader>so :source ~\_vimrc<cr>
+noremap <LEADER>rc :e ~\AppData\Local\nvim\init.vim<CR>
+noremap <LEADER>rn :exe 'edit '.stdpath('config').'/init.vim'<CR>
+noremap <LEADER>rv :e ~\_vimrc<CR>
+noremap <LEADER>so :source ~\_vimrc<CR>
 " % means current buffer
 
-" {{{ folding
-noremap <silent> <leader>o za
+" {{{ Folding
+noremap <silent> <LEADER>o za
 "}}}
 
-"{{{ compile function
-noremap <leader>r :call compilerungcc()<cr>
-func! compilerungcc()
+"{{{ Compile function
+noremap <LEADER>r :call CompileRunGcc()<CR>
+func! CompileRunGcc()
 	"execute write function first
 	exec "w"
 	if &filetype == 'python'
@@ -189,13 +204,13 @@ func! compilerungcc()
 	elseif &filetype == 'html'
 		silent! exec "!".g:mkdp_browser." % &"
 	elseif &filetype == 'markdown'
-		silent! exec "markdownpreview"
+		silent! exec "MarkdownPreview"
 	elseif &filetype == 'tex'
-		silent! exec "vimtexstop"
-		silent! exec "vimtexcompile"
+		silent! exec "VimtexStop"
+		silent! exec "VimtexCompile"
 	endif
 endfunc
 "}}}
 
 " vim rooter
-let g:rooter_target = '*' " this is all files
+let g:rooter_target = '*' " this is All files
